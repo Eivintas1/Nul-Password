@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="NUL — Enter the archive" />
+    <meta name="theme-color" content="#090909" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>NUL — Enter</title>
+    <style>
+      :root {
+        --bg: #090909;
+        --bg-elevated: #111111;
+        --text-primary: #f1efe9;
+        --text-muted: #8e8e8e;
+        --accent: rgba(255, 255, 255, 0.9);
+        --border: rgba(255, 255, 255, 0.12);
+        --glow: rgba(255, 255, 255, 0.15);
+        --water: rgba(200, 220, 240, 0.8);
+        --water-light: rgba(255, 255, 255, 0.6);
+        --font-serif: Georgia, 'Times New Roman', 'Noto Serif', serif;
+        --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        font-size: 16px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      body {
+        font-family: var(--font-sans);
+        color: var(--text-primary);
+        background-color: var(--bg);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* Film grain overlay */
+      body::after {
+        content: '';
+        position: fixed;
+        top: -10%;
+        left: -10%;
+        width: 120%;
+        height: 120%;
+        z-index: 100;
+        pointer-events: none;
+        opacity: 0.03;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-repeat: repeat;
+        background-size: 200px 200px;
+        animation: grain 0.5s steps(1) infinite;
+      }
+
+      @keyframes grain {
+        0%, 100% { transform: translate(0, 0); }
+        10% { transform: translate(-2%, -3%); }
+        20% { transform: translate(3%, 1%); }
+        30% { transform: translate(-1%, 2%); }
+        40% { transform: translate(2%, -2%); }
+        50% { transform: translate(-3%, 1%); }
+        60% { transform: translate(1%, -1%); }
+        70% { transform: translate(-2%, 3%); }
+        80% { transform: translate(3%, -3%); }
+        90% { transform: translate(-1%, -2%); }
+      }
+
+      /* ==================== DROPLET ==================== */
+
+      .droplet-scene {
+        position: fixed;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .droplet {
+        position: absolute;
+        top: -40px;
+        left: 50%;
+        width: 8px;
+        height: 12px;
+        transform: translateX(-50%);
+        background: radial-gradient(ellipse at 30% 30%, var(--water-light), var(--water));
+        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        opacity: 0;
+        box-shadow: 0 0 12px rgba(200, 220, 240, 0.3), 0 0 24px rgba(200, 220, 240, 0.15);
+      }
+
+      .droplet.fall {
+        animation: dropletFall 1.2s cubic-bezier(0.35, 0, 0.65, 1) forwards;
+      }
+
+      @keyframes dropletFall {
+        0% {
+          opacity: 1;
+          top: -40px;
+          transform: translateX(-50%) scale(0.8);
+        }
+        70% {
+          opacity: 1;
+          top: calc(50% - 6px);
+          transform: translateX(-50%) scale(1);
+        }
+        85% {
+          opacity: 1;
+          top: 50%;
+          transform: translateX(-50%) scaleX(1.5) scaleY(0.5);
+        }
+        100% {
+          opacity: 0;
+          top: 50%;
+          transform: translateX(-50%) scaleX(2) scaleY(0.2);
+        }
+      }
+
+      /* Impact flash */
+      .impact {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.8), transparent);
+        border-radius: 50%;
+        opacity: 0;
+      }
+
+      .impact.flash {
+        animation: impactFlash 0.5s ease-out forwards;
+      }
+
+      @keyframes impactFlash {
+        0% {
+          width: 0;
+          height: 0;
+          opacity: 0.8;
+        }
+        100% {
+          width: 120px;
+          height: 120px;
+          opacity: 0;
+        }
+      }
+
+      /* ==================== RIPPLES ==================== */
+
+      .ripple-scene {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .ripple {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        opacity: 0;
+      }
+
+      .ripple.expand {
+        animation: rippleExpand 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
+      @keyframes rippleExpand {
+        0% {
+          width: 0;
+          height: 0;
+          opacity: 0.5;
+          border-width: 2px;
+        }
+        100% {
+          width: 250vmax;
+          height: 250vmax;
+          opacity: 0;
+          border-width: 0.5px;
+        }
+      }
+
+      /* ==================== MAIN CONTENT ==================== */
+
+      .gate {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3rem;
+        padding: 2rem;
+        max-width: 480px;
+        width: 100%;
+        opacity: 0;
+        transform: translateY(20px);
+        filter: blur(10px);
+        transition: all 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .gate.revealed {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+      }
+
+      /* Brand mark */
+      .brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .brand__mark {
+        font-family: var(--font-serif);
+        font-size: clamp(4rem, 12vw, 7rem);
+        font-weight: 400;
+        letter-spacing: -0.03em;
+        line-height: 1;
+        color: var(--text-primary);
+        position: relative;
+      }
+
+      .brand__mark::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 1px;
+        background: var(--accent);
+        box-shadow: 0 0 8px var(--glow), 0 0 16px var(--glow);
+        transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+      }
+
+      .gate.revealed .brand__mark::after {
+        width: 80px;
+      }
+
+      .brand__sub {
+        font-family: var(--font-sans);
+        font-size: 0.65rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.3em;
+        color: var(--text-muted);
+      }
+
+      /* Password form */
+      .form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2rem;
+        width: 100%;
+      }
+
+      .input-wrap {
+        position: relative;
+        width: 100%;
+        max-width: 320px;
+      }
+
+      .input {
+        width: 100%;
+        padding: 1rem 0;
+        font-family: var(--font-sans);
+        font-size: 0.85rem;
+        font-weight: 400;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        text-align: center;
+        color: var(--text-primary);
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--border);
+        outline: none;
+        transition: border-color 0.4s ease;
+        caret-color: var(--accent);
+      }
+
+      .input::placeholder {
+        color: var(--text-muted);
+        opacity: 0.5;
+        letter-spacing: 0.3em;
+      }
+
+      .input:focus {
+        border-bottom-color: var(--text-primary);
+      }
+
+      .input-line {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 1px;
+        background: var(--accent);
+        box-shadow: 0 0 6px var(--glow), 0 0 12px var(--glow);
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        transform: translateX(-50%);
+      }
+
+      .input:focus ~ .input-line {
+        width: 100%;
+      }
+
+      .submit {
+        font-family: var(--font-sans);
+        font-size: 0.65rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.3em;
+        color: var(--text-muted);
+        padding: 0.75rem 2rem;
+        border: 1px solid var(--border);
+        background: transparent;
+        cursor: pointer;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .submit::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--accent);
+        transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: -1;
+      }
+
+      .submit:hover {
+        color: var(--bg);
+        border-color: var(--accent);
+        box-shadow: 0 0 10px var(--glow), 0 0 20px var(--glow);
+      }
+
+      .submit:hover::before {
+        left: 0;
+      }
+
+      .submit:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      /* Error state */
+      .error {
+        font-family: var(--font-sans);
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: var(--accent);
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+        height: 1.2rem;
+      }
+
+      .error.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      @keyframes glitch {
+        0% { transform: translate(0); }
+        20% { transform: translate(-2px, 2px); }
+        40% { transform: translate(-2px, -2px); }
+        60% { transform: translate(2px, 2px); }
+        80% { transform: translate(2px, -2px); }
+        100% { transform: translate(0); }
+      }
+
+      .gate.shake {
+        animation: glitch 0.3s ease;
+      }
+
+      /* Transition overlay */
+      .transition-overlay {
+        position: fixed;
+        inset: 0;
+        background: var(--bg);
+        z-index: 1000;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.6s ease;
+      }
+
+      .transition-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      /* Footer hint */
+      .hint {
+        position: fixed;
+        bottom: 2rem;
+        font-family: var(--font-sans);
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3em;
+        color: var(--text-muted);
+        opacity: 0;
+        transition: opacity 0.6s ease;
+        z-index: 10;
+      }
+
+      .hint.visible {
+        opacity: 1;
+      }
+
+      /* Scanlines */
+      .scanlines {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 99;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 1px,
+          rgba(0, 0, 0, 0.03) 1px,
+          rgba(0, 0, 0, 0.03) 2px
+        );
+      }
+
+      /* Reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+
+        .droplet-scene,
+        .ripple-scene {
+          display: none;
+        }
+
+        .gate {
+          opacity: 1;
+          transform: none;
+          filter: none;
+        }
+
+        .hint {
+          opacity: 1;
+        }
+      }
+
+      /* Mobile adjustments */
+      @media (max-width: 480px) {
+        .gate {
+          gap: 2.5rem;
+          padding: 1.5rem;
+        }
+
+        .brand__mark {
+          font-size: clamp(3rem, 15vw, 5rem);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Droplet scene -->
+    <div class="droplet-scene">
+      <div class="droplet" id="droplet"></div>
+      <div class="impact" id="impact"></div>
+    </div>
+
+    <!-- Ripple scene -->
+    <div class="ripple-scene" id="rippleScene">
+      <div class="ripple" id="ripple1"></div>
+      <div class="ripple" id="ripple2"></div>
+      <div class="ripple" id="ripple3"></div>
+      <div class="ripple" id="ripple4"></div>
+      <div class="ripple" id="ripple5"></div>
+    </div>
+
+    <!-- Scanlines -->
+    <div class="scanlines"></div>
+    <div class="transition-overlay" id="overlay"></div>
+
+    <!-- Password gate -->
+    <main class="gate" id="gate">
+      <div class="brand">
+        <div class="brand__mark">NUL</div>
+        <div class="brand__sub">Fashion Archive</div>
+      </div>
+
+      <form class="form" id="form" autocomplete="off">
+        <div class="input-wrap">
+          <input
+            type="password"
+            class="input"
+            id="password"
+            placeholder="Enter code"
+            autocomplete="off"
+            spellcheck="false"
+            disabled
+          />
+          <div class="input-line"></div>
+        </div>
+
+        <div class="error" id="error">Access denied</div>
+
+        <button type="submit" class="submit" disabled>Enter</button>
+      </form>
+    </main>
+
+    <div class="hint" id="hint">Authorized personnel only</div>
+
+    <script>
+      const CONFIG = {
+        password: 'nul2024',
+        redirectUrl: 'https://nul-fashion.eivintas-a.workers.dev/'
+      };
+
+      // ==================== ANIMATION ====================
+
+      const droplet = document.getElementById('droplet');
+      const impact = document.getElementById('impact');
+      const ripples = [
+        document.getElementById('ripple1'),
+        document.getElementById('ripple2'),
+        document.getElementById('ripple3'),
+        document.getElementById('ripple4'),
+        document.getElementById('ripple5')
+      ];
+
+      async function runAnimation() {
+        // Pause, then droplet falls
+        await sleep(600);
+        droplet.classList.add('fall');
+
+        // Wait for impact
+        await sleep(900);
+        impact.classList.add('flash');
+
+        // Ripples expand with staggered delays
+        await sleep(100);
+        ripples.forEach((r, i) => {
+          setTimeout(() => r.classList.add('expand'), i * 150);
+        });
+
+        // Reveal content as ripples expand
+        await sleep(600);
+        document.getElementById('gate').classList.add('revealed');
+
+        // Enable form
+        await sleep(800);
+        const passwordInput = document.getElementById('password');
+        const submitBtn = document.querySelector('.submit');
+        passwordInput.disabled = false;
+        submitBtn.disabled = false;
+        passwordInput.focus();
+
+        // Show hint
+        document.getElementById('hint').classList.add('visible');
+
+        // Clean up droplet scene after animation
+        await sleep(2000);
+        document.querySelector('.droplet-scene').style.display = 'none';
+      }
+
+      function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+
+      // ==================== FORM ====================
+
+      const form = document.getElementById('form');
+      const passwordInput = document.getElementById('password');
+      const errorEl = document.getElementById('error');
+      const gateEl = document.getElementById('gate');
+      const overlay = document.getElementById('overlay');
+
+      let isSubmitting = false;
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (isSubmitting) return;
+
+        const value = passwordInput.value.trim();
+
+        if (!value) {
+          showError('Enter the code');
+          shakeGate();
+          return;
+        }
+
+        if (value === CONFIG.password) {
+          isSubmitting = true;
+          overlay.classList.add('active');
+          await sleep(600);
+          window.location.href = CONFIG.redirectUrl;
+        } else {
+          showError('Access denied');
+          shakeGate();
+          passwordInput.value = '';
+          passwordInput.focus();
+        }
+      });
+
+      function showError(message) {
+        errorEl.textContent = message;
+        errorEl.classList.add('visible');
+        setTimeout(() => errorEl.classList.remove('visible'), 2000);
+      }
+
+      function shakeGate() {
+        gateEl.classList.add('shake');
+        setTimeout(() => gateEl.classList.remove('shake'), 300);
+      }
+
+      passwordInput.addEventListener('input', () => {
+        errorEl.classList.remove('visible');
+      });
+
+      // Start
+      runAnimation();
+    </script>
+  </body>
+</html>
