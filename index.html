@@ -13,11 +13,13 @@
         --bg-elevated: #111111;
         --text-primary: #f1efe9;
         --text-muted: #8e8e8e;
-        --accent: rgba(255, 255, 255, 0.9);
+        --accent: rgba(255, 255, 255, 0.85);
         --border: rgba(255, 255, 255, 0.12);
-        --glow: rgba(255, 255, 255, 0.15);
-        --water: rgba(200, 220, 240, 0.8);
-        --water-light: rgba(255, 255, 255, 0.6);
+        --glow: rgba(220, 235, 255, 0.2);
+        --glow-strong: rgba(220, 235, 255, 0.35);
+        --water: rgba(180, 210, 240, 0.9);
+        --water-light: rgba(220, 235, 255, 0.7);
+        --water-glow: rgba(180, 210, 240, 0.4);
         --font-serif: Georgia, 'Times New Roman', 'Noto Serif', serif;
         --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       }
@@ -89,43 +91,101 @@
         overflow: hidden;
       }
 
+      /* Droplet trail */
+      .droplet-trail {
+        position: absolute;
+        top: -60px;
+        left: 50%;
+        width: 2px;
+        height: 0;
+        transform: translateX(-50%);
+        background: linear-gradient(to bottom, transparent, var(--water-glow));
+        opacity: 0;
+        filter: blur(1px);
+      }
+
+      .droplet-trail.active {
+        animation: trailGrow 1.4s cubic-bezier(0.35, 0, 0.65, 1) forwards;
+      }
+
+      @keyframes trailGrow {
+        0% {
+          height: 0;
+          opacity: 0;
+          top: -60px;
+        }
+        20% {
+          opacity: 0.6;
+        }
+        70% {
+          height: 80px;
+          opacity: 0.4;
+          top: calc(50% - 80px);
+        }
+        100% {
+          height: 0;
+          opacity: 0;
+          top: 50%;
+        }
+      }
+
       .droplet {
         position: absolute;
-        top: -40px;
+        top: -60px;
         left: 50%;
-        width: 8px;
-        height: 12px;
+        width: 10px;
+        height: 14px;
         transform: translateX(-50%);
-        background: radial-gradient(ellipse at 30% 30%, var(--water-light), var(--water));
+        background: radial-gradient(ellipse at 30% 25%, var(--water-light), var(--water));
         border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
         opacity: 0;
-        box-shadow: 0 0 12px rgba(200, 220, 240, 0.3), 0 0 24px rgba(200, 220, 240, 0.15);
+        box-shadow:
+          0 0 15px var(--water-glow),
+          0 0 30px rgba(180, 210, 240, 0.2),
+          0 0 60px rgba(180, 210, 240, 0.1);
+      }
+
+      .droplet::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 3px;
+        width: 3px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 50%;
+        filter: blur(0.5px);
       }
 
       .droplet.fall {
-        animation: dropletFall 1.2s cubic-bezier(0.35, 0, 0.65, 1) forwards;
+        animation: dropletFall 1.4s cubic-bezier(0.25, 0, 0.6, 1) forwards;
       }
 
       @keyframes dropletFall {
         0% {
           opacity: 1;
-          top: -40px;
-          transform: translateX(-50%) scale(0.8);
+          top: -60px;
+          transform: translateX(-50%) scale(0.6);
+        }
+        15% {
+          opacity: 1;
+          top: -20px;
+          transform: translateX(-50%) scale(0.85);
         }
         70% {
           opacity: 1;
-          top: calc(50% - 6px);
+          top: calc(50% - 7px);
           transform: translateX(-50%) scale(1);
         }
-        85% {
+        82% {
           opacity: 1;
           top: 50%;
-          transform: translateX(-50%) scaleX(1.5) scaleY(0.5);
+          transform: translateX(-50%) scaleX(1.6) scaleY(0.4);
         }
         100% {
           opacity: 0;
           top: 50%;
-          transform: translateX(-50%) scaleX(2) scaleY(0.2);
+          transform: translateX(-50%) scaleX(2.5) scaleY(0.1);
         }
       }
 
@@ -137,26 +197,48 @@
         width: 0;
         height: 0;
         transform: translate(-50%, -50%);
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.8), transparent);
+        background: radial-gradient(circle, rgba(220, 235, 255, 0.9), rgba(180, 210, 240, 0.3), transparent);
         border-radius: 50%;
         opacity: 0;
       }
 
       .impact.flash {
-        animation: impactFlash 0.5s ease-out forwards;
+        animation: impactFlash 0.6s ease-out forwards;
       }
 
       @keyframes impactFlash {
         0% {
           width: 0;
           height: 0;
-          opacity: 0.8;
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.6;
         }
         100% {
-          width: 120px;
-          height: 120px;
+          width: 160px;
+          height: 160px;
           opacity: 0;
         }
+      }
+
+      /* Splash particles */
+      .splash {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+      }
+
+      .splash-particle {
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        background: var(--water-light);
+        border-radius: 50%;
+        opacity: 0;
+        box-shadow: 0 0 6px var(--water-glow);
       }
 
       /* ==================== RIPPLES ==================== */
@@ -177,7 +259,7 @@
         width: 0;
         height: 0;
         border-radius: 50%;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(220, 235, 255, 0.15);
         opacity: 0;
       }
 
@@ -189,7 +271,7 @@
         0% {
           width: 0;
           height: 0;
-          opacity: 0.5;
+          opacity: 0.4;
           border-width: 2px;
         }
         100% {
@@ -240,6 +322,7 @@
         line-height: 1;
         color: var(--text-primary);
         position: relative;
+        text-shadow: 0 0 40px rgba(220, 235, 255, 0.08);
       }
 
       .brand__mark::after {
@@ -251,7 +334,7 @@
         width: 0;
         height: 1px;
         background: var(--accent);
-        box-shadow: 0 0 8px var(--glow), 0 0 16px var(--glow);
+        box-shadow: 0 0 8px var(--glow), 0 0 16px var(--glow), 0 0 32px rgba(220, 235, 255, 0.08);
         transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
       }
 
@@ -308,7 +391,7 @@
       }
 
       .input:focus {
-        border-bottom-color: var(--text-primary);
+        border-bottom-color: rgba(220, 235, 255, 0.3);
       }
 
       .input-line {
@@ -318,7 +401,7 @@
         width: 0;
         height: 1px;
         background: var(--accent);
-        box-shadow: 0 0 6px var(--glow), 0 0 12px var(--glow);
+        box-shadow: 0 0 6px var(--glow), 0 0 12px var(--glow), 0 0 24px rgba(220, 235, 255, 0.08);
         transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         transform: translateX(-50%);
       }
@@ -357,8 +440,8 @@
 
       .submit:hover {
         color: var(--bg);
-        border-color: var(--accent);
-        box-shadow: 0 0 10px var(--glow), 0 0 20px var(--glow);
+        border-color: rgba(220, 235, 255, 0.4);
+        box-shadow: 0 0 10px var(--glow), 0 0 20px rgba(220, 235, 255, 0.08);
       }
 
       .submit:hover::before {
@@ -495,8 +578,10 @@
   <body>
     <!-- Droplet scene -->
     <div class="droplet-scene">
+      <div class="droplet-trail" id="trail"></div>
       <div class="droplet" id="droplet"></div>
       <div class="impact" id="impact"></div>
+      <div class="splash" id="splash"></div>
     </div>
 
     <!-- Ripple scene -->
@@ -550,7 +635,9 @@
       // ==================== ANIMATION ====================
 
       const droplet = document.getElementById('droplet');
+      const trail = document.getElementById('trail');
       const impact = document.getElementById('impact');
+      const splash = document.getElementById('splash');
       const ripples = [
         document.getElementById('ripple1'),
         document.getElementById('ripple2'),
@@ -559,22 +646,61 @@
         document.getElementById('ripple5')
       ];
 
+      function createSplashParticles() {
+        const count = 10;
+        for (let i = 0; i < count; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'splash-particle';
+          const angle = (i / count) * Math.PI * 2;
+          const distance = 30 + Math.random() * 50;
+          const x = Math.cos(angle) * distance;
+          const y = Math.sin(angle) * distance - 20;
+          const delay = Math.random() * 0.15;
+          const size = 2 + Math.random() * 3;
+
+          particle.style.width = `${size}px`;
+          particle.style.height = `${size}px`;
+          particle.style.animation = `splashParticle 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s forwards`;
+          particle.style.setProperty('--x', `${x}px`);
+          particle.style.setProperty('--y', `${y}px`);
+
+          splash.appendChild(particle);
+        }
+
+        const style = document.createElement('style');
+        style.textContent = `
+          @keyframes splashParticle {
+            0% {
+              opacity: 1;
+              transform: translate(0, 0) scale(1);
+            }
+            100% {
+              opacity: 0;
+              transform: translate(var(--x), var(--y)) scale(0.2);
+            }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
       async function runAnimation() {
-        // Pause, then droplet falls
-        await sleep(600);
+        // Start trail and droplet
+        await sleep(500);
+        trail.classList.add('active');
         droplet.classList.add('fall');
 
         // Wait for impact
-        await sleep(900);
+        await sleep(1000);
         impact.classList.add('flash');
+        createSplashParticles();
 
-        // Ripples expand with staggered delays
+        // Ripples expand with stagger
         await sleep(100);
         ripples.forEach((r, i) => {
           setTimeout(() => r.classList.add('expand'), i * 150);
         });
 
-        // Reveal content as ripples expand
+        // Reveal content
         await sleep(600);
         document.getElementById('gate').classList.add('revealed');
 
@@ -589,7 +715,7 @@
         // Show hint
         document.getElementById('hint').classList.add('visible');
 
-        // Clean up droplet scene after animation
+        // Clean up
         await sleep(2000);
         document.querySelector('.droplet-scene').style.display = 'none';
       }
