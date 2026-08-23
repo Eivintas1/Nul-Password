@@ -315,14 +315,10 @@
       }
 
       .brand__mark {
-        font-family: var(--font-serif);
-        font-size: clamp(4rem, 12vw, 7rem);
-        font-weight: 400;
-        letter-spacing: -0.03em;
-        line-height: 1;
-        color: var(--text-primary);
+        height: clamp(80px, 20vw, 140px);
+        width: auto;
+        filter: brightness(0) invert(1) drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
         position: relative;
-        text-shadow: 0 0 40px rgba(220, 235, 255, 0.08);
       }
 
       .brand__mark::after {
@@ -570,7 +566,7 @@
         }
 
         .brand__mark {
-          font-size: clamp(3rem, 15vw, 5rem);
+          height: clamp(70px, 22vw, 110px);
         }
       }
     </style>
@@ -600,7 +596,7 @@
     <!-- Password gate -->
     <main class="gate" id="gate">
       <div class="brand">
-        <div class="brand__mark">NUL</div>
+        <img src="logo.png" alt="NUL" class="brand__mark" />
         <div class="brand__sub">Fashion Archive</div>
       </div>
 
