@@ -558,6 +558,332 @@
         }
       }
 
+      /* Newsletter trigger */
+      .newsletter-trigger {
+        font-family: var(--font-sans);
+        font-size: 0.6rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.25em;
+        color: var(--text-muted);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        transition: color 0.3s ease;
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      .gate.revealed .newsletter-trigger {
+        opacity: 1;
+        transform: translateY(0);
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s;
+      }
+
+      .newsletter-trigger:hover {
+        color: var(--text-primary);
+      }
+
+      /* Newsletter modal overlay */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0);
+        backdrop-filter: blur(0px);
+        z-index: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: background 0.5s ease, backdrop-filter 0.5s ease, opacity 0.4s ease;
+      }
+
+      .modal-overlay.open {
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      /* Newsletter modal */
+      .modal {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        padding: 2.5rem 2rem 2rem;
+        max-width: 360px;
+        width: 90%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        transform: translateY(-60px) scale(0.8);
+        opacity: 0;
+        filter: blur(6px);
+        transition: none;
+      }
+
+      .modal-overlay.open .modal {
+        animation: modalDrop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+                   modalGlow 2s ease-in-out 0.8s 1;
+      }
+
+      .modal-overlay.closing .modal {
+        animation: modalOut 0.3s ease-in forwards;
+      }
+
+      @keyframes modalDrop {
+        0% {
+          transform: translateY(-60px) scale(0.8);
+          opacity: 0;
+          filter: blur(6px);
+        }
+        40% {
+          opacity: 1;
+          filter: blur(0);
+        }
+        70% {
+          transform: translateY(6px) scale(1.02);
+        }
+        85% {
+          transform: translateY(-2px) scale(0.99);
+        }
+        100% {
+          transform: translateY(0) scale(1);
+          opacity: 1;
+          filter: blur(0);
+        }
+      }
+
+      @keyframes modalGlow {
+        0% { box-shadow: 0 0 0 rgba(220, 235, 255, 0); border-color: var(--border); }
+        50% { box-shadow: 0 0 30px rgba(220, 235, 255, 0.15), 0 0 60px rgba(180, 210, 240, 0.08); border-color: rgba(220, 235, 255, 0.3); }
+        100% { box-shadow: 0 0 0 rgba(220, 235, 255, 0); border-color: var(--border); }
+      }
+
+      @keyframes modalOut {
+        0% {
+          transform: translateY(0) scale(1);
+          opacity: 1;
+          filter: blur(0);
+        }
+        100% {
+          transform: translateY(-30px) scale(0.9);
+          opacity: 0;
+          filter: blur(4px);
+        }
+      }
+
+      /* Ripple ring expanding from modal center */
+      .modal-ripple {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        border: 1px solid rgba(220, 235, 255, 0.2);
+        pointer-events: none;
+        opacity: 0;
+      }
+
+      .modal-overlay.open .modal-ripple {
+        animation: modalRipple 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
+      @keyframes modalRipple {
+        0% {
+          width: 0;
+          height: 0;
+          opacity: 0.5;
+          border-width: 2px;
+        }
+        100% {
+          width: 500px;
+          height: 500px;
+          opacity: 0;
+          border-width: 0.5px;
+        }
+      }
+
+      /* Staggered content reveal */
+      .modal__close {
+        position: absolute;
+        top: 0.8rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        cursor: pointer;
+        padding: 0.25rem;
+        line-height: 1;
+        opacity: 0;
+        transform: rotate(-90deg) scale(0.5);
+        transition: color 0.3s ease;
+      }
+
+      .modal-overlay.open .modal__close {
+        animation: contentFade 0.4s ease forwards 0.6s;
+      }
+
+      .modal__close:hover {
+        color: var(--text-primary);
+      }
+
+      .modal__heading {
+        font-family: var(--font-sans);
+        font-size: 0.65rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.3em;
+        color: var(--text-muted);
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      .modal-overlay.open .modal__heading {
+        animation: contentFade 0.5s ease forwards 0.35s;
+      }
+
+      .modal__form {
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.2rem;
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      .modal-overlay.open .modal__form {
+        animation: contentFade 0.5s ease forwards 0.5s;
+      }
+
+      @keyframes contentFade {
+        0% {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .modal__input-wrap {
+        width: 100%;
+        position: relative;
+      }
+
+      .modal__input {
+        width: 100%;
+        padding: 0.7rem 0;
+        font-family: var(--font-sans);
+        font-size: 0.75rem;
+        font-weight: 400;
+        letter-spacing: 0.15em;
+        color: var(--text-primary);
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--border);
+        outline: none;
+        transition: border-color 0.4s ease;
+        caret-color: var(--accent);
+      }
+
+      .modal__input::placeholder {
+        color: var(--text-muted);
+        opacity: 0.5;
+        letter-spacing: 0.2em;
+        font-size: 0.65rem;
+      }
+
+      .modal__input:focus {
+        border-bottom-color: rgba(220, 235, 240, 0.3);
+      }
+
+      .modal__line {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 1px;
+        background: var(--accent);
+        box-shadow: 0 0 6px var(--glow), 0 0 12px var(--glow);
+        transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        transform: translateX(-50%);
+      }
+
+      .modal__input:focus ~ .modal__line {
+        width: 100%;
+      }
+
+      .modal__btn {
+        font-family: var(--font-sans);
+        font-size: 0.6rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.3em;
+        color: var(--text-muted);
+        padding: 0.7rem 2rem;
+        border: 1px solid var(--border);
+        background: transparent;
+        cursor: pointer;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .modal__btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--accent);
+        transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: -1;
+      }
+
+      .modal__btn:hover {
+        color: var(--bg);
+        border-color: rgba(220, 235, 240, 0.4);
+        box-shadow: 0 0 10px var(--glow), 0 0 20px rgba(220, 235, 240, 0.08);
+      }
+
+      .modal__btn:hover::before {
+        left: 0;
+      }
+
+      .modal__status {
+        font-family: var(--font-sans);
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        height: 1.2rem;
+        opacity: 0;
+        transform: translateY(-8px);
+        transition: all 0.3s ease;
+      }
+
+      .modal__status.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .modal__status--success {
+        color: var(--water);
+      }
+
+      .modal__status--error {
+        color: var(--accent);
+      }
+
       /* Mobile adjustments */
       @media (max-width: 480px) {
         .gate {
@@ -618,7 +944,34 @@
 
         <button type="submit" class="submit" disabled>Enter</button>
       </form>
+
+      <button class="newsletter-trigger" id="newsletterOpen">Newsletter</button>
     </main>
+
+    <!-- Newsletter modal -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal">
+        <div class="modal-ripple"></div>
+        <button class="modal__close" id="modalClose">&times;</button>
+        <span class="modal__heading">Stay in the loop</span>
+        <form class="modal__form" id="newsletterForm" autocomplete="off">
+          <div class="modal__input-wrap">
+            <input
+              type="email"
+              class="modal__input"
+              id="newsletterEmail"
+              placeholder="your@email.com"
+              autocomplete="off"
+              spellcheck="false"
+              required
+            />
+            <div class="modal__line"></div>
+          </div>
+          <button type="submit" class="modal__btn">Subscribe</button>
+        </form>
+        <div class="modal__status" id="newsletterStatus"></div>
+      </div>
+    </div>
 
     <div class="hint" id="hint">Authorized personnel only</div>
 
@@ -711,6 +1064,11 @@
         // Show hint
         document.getElementById('hint').classList.add('visible');
 
+        // Auto-open newsletter modal
+        await sleep(800);
+        openModal();
+        newsletterEmail.focus();
+
         // Clean up
         await sleep(2000);
         document.querySelector('.droplet-scene').style.display = 'none';
@@ -768,6 +1126,83 @@
 
       passwordInput.addEventListener('input', () => {
         errorEl.classList.remove('visible');
+      });
+
+      // ==================== NEWSLETTER MODAL ====================
+
+      const modalOverlay = document.getElementById('modalOverlay');
+      const newsletterOpen = document.getElementById('newsletterOpen');
+      const modalClose = document.getElementById('modalClose');
+      const newsletterForm = document.getElementById('newsletterForm');
+      const newsletterEmail = document.getElementById('newsletterEmail');
+      const newsletterStatus = document.getElementById('newsletterStatus');
+
+      const SHOPIFY_STORE = 'https://nul-fashion.eivintas-a.workers.dev';
+
+      function openModal() {
+        modalOverlay.classList.remove('closing');
+        modalOverlay.classList.add('open');
+      }
+
+      function closeModal() {
+        modalOverlay.classList.add('closing');
+        setTimeout(() => {
+          modalOverlay.classList.remove('open', 'closing');
+        }, 300);
+      }
+
+      newsletterOpen.addEventListener('click', openModal);
+      modalClose.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) closeModal();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal();
+      });
+
+      newsletterForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = newsletterEmail.value.trim();
+        if (!email) return;
+
+        const btn = newsletterForm.querySelector('.modal__btn');
+        btn.textContent = '...';
+        btn.disabled = true;
+
+        try {
+          const res = await fetch(`${SHOPIFY_STORE}/contact`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+              'form_type': 'customer',
+              'contact[tags]': 'newsletter',
+              'contact[email]': email
+            })
+          });
+
+          if (res.ok || res.status === 302) {
+            showNewsletterStatus('Subscribed', 'success');
+            newsletterEmail.value = '';
+            setTimeout(() => closeModal(), 1500);
+          } else {
+            throw new Error('Request failed');
+          }
+        } catch {
+          showNewsletterStatus('Try again', 'error');
+        } finally {
+          btn.textContent = 'Subscribe';
+          btn.disabled = false;
+        }
+      });
+
+      function showNewsletterStatus(message, type) {
+        newsletterStatus.textContent = message;
+        newsletterStatus.className = `modal__status visible modal__status--${type}`;
+        setTimeout(() => newsletterStatus.classList.remove('visible'), 3000);
+      }
+
+      newsletterEmail.addEventListener('input', () => {
+        newsletterStatus.classList.remove('visible');
       });
 
       // Start
