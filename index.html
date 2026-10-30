@@ -977,7 +977,6 @@
 
     <script>
      const CONFIG = {
-        password: 'nul2024',
         redirectUrl: 'https://shop.nul.ac'
       };
 
@@ -1100,7 +1099,19 @@
           return;
         }
 
-        if (value === CONFIG.password) {
+let ok = false;
+        try {
+          const res = await fetch('/api/enter', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: value }),
+          });
+          ok = res.ok;
+        } catch (err) {
+          ok = false;
+        }
+
+        if (ok) {
           isSubmitting = true;
           overlay.classList.add('active');
           await sleep(600);
